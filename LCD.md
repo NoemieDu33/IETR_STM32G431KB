@@ -24,7 +24,8 @@ Nous allons utiliser l'écran en mode 4 bits.
 On le branche sur du 5V. 
 Cet écran n'utilise pas de procotole particulier. On lui envoie des instructions en hexadécimal en utilisant la table d'instructions, et on envoie une pulsation dans la broche E qui exécute l'instruction.
 
-![Table d'instructions](./16x2.png "")
+![Table d'instructions](./table.png "")
+
 Pour réinitialiser l'écran, on envoie trois fois l'instruction 0x03 (broches D4 et D5). Cette instruction n'est pas citée dans la table.
 
 ## Setup du GPIO
@@ -41,10 +42,11 @@ DATA PINS aux bonnes valeurs -> Broche E en valeur haute -> Broche E en valeur b
 * Idéalement on met des délais d'au moins deux millisecondes entre chaque instruction car l'écran a besoin de temps pour traiter les instructions. 
 * Quand on utilise le LCD en mode 4 bits, on envoie 2 instructions de 4 bits au lieu d'une instruction de 8 bits.
 * Pour correctement régler l'écran, on va faire cet ordre d'instructions:
-> ETEINDRE ECRAN (``0x8``)
-> RESET (``0x3`` -> ``0x3`` -> ``0x3``)
-> MODE 4 BITS (``0x2``)
-> CLEAR DISPLAY (``0x0`` -> ``0x1``)
-> RETURN HOME (``0x0`` -> ``0x2``)
-> ALLUMER ECRAN (``0x0`` -> ``0xD``, ``0xE`` ou ``0xF``)
+1. ETEINDRE ECRAN (``0x8``)
+2. RESET (``0x3`` -> ``0x3`` -> ``0x3``)
+3. MODE 4 BITS (``0x2``)
+4. CLEAR DISPLAY (``0x0`` -> ``0x1``)
+5. RETURN HOME (``0x0`` -> ``0x2``)
+6. ALLUMER ECRAN (``0x0`` -> ``0xD``, ``0xE`` ou ``0xF``)
+
 * Pour ensuite écrire des caractères, on passe la broche RS à 1 et on envoie des instructions en ASCII. Par exemple, "FLOE" sera : ``0x46``=(``0x4``->``0x6``), ``0x4C``=(``0x4``->``0xC``), ``0x4F``=(``0x4``->``0xF``), ``0x45``=(``0x4``->``0x5``)
