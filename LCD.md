@@ -49,4 +49,6 @@ DATA PINS aux bonnes valeurs -> Broche E en valeur haute -> Broche E en valeur b
 5. RETURN HOME (``0x0`` -> ``0x2``)
 6. ALLUMER ECRAN (``0x0`` -> ``0xD``, ``0xE`` ou ``0xF``)
 
-* Pour ensuite écrire des caractères, on passe la broche RS à 1 et on envoie des instructions en ASCII. Par exemple, "FLOE" sera : ``0x46``=(``0x4``->``0x6``), ``0x4C``=(``0x4``->``0xC``), ``0x4F``=(``0x4``->``0xF``), ``0x45``=(``0x4``->``0x5``)
+* Pour ensuite écrire des caractères, on passe la broche RS à 1 et on envoie des instructions en ASCII. Par exemple, "FLOE" sera : 
+
+``0x46``=(``0x4``->``0x6``), ``0x4C``=(``0x4``->``0xC``), ``0x4F``=(``0x4``->``0xF``), ``0x45``=(``0x4``->``0x5``)
