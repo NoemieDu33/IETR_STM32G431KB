@@ -54,6 +54,16 @@ void init_2Y0A21(void) {
 
     ADC1->CFGR |= ADC_CFGR_CONT; // Conversion en mode continu 
  
+    // CFGR permet de modifier les fréquences vers les diff. bus (Divisions, etc).
+    // On ne met aucune division sur nos bus AHB, APB1 et APB2.
+
+    RCC -> CFGR |= RCC_CFGR_HPRE_DIV1; // AHB
+    RCC -> CFGR |= RCC_CFGR_PPRE1_DIV1; // APB1
+    RCC -> CFGR |= RCC_CFGR_PPRE2_DIV1; // APB2
+
+    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW)); 
+    RCC->CFGR |= RCC_CFGR_SW_HSI; // SW = switch, ici on met la HSI comme SYSCLK
+
     /*
     SQR1 est un registre sur 4 bits.
 
@@ -83,6 +93,7 @@ void init_2Y0A21(void) {
     0x6 = 247.5
     0x7 = 640.5
     */
+    
     ADC1->SMPR1 &= ~(ADC_SMPR1_SMP1); // On setup l'échantillonnage
     ADC1->SMPR1 |=  (0x7 << 0x3); // SMP1 est du bit 0x3 au bit 0x5
 

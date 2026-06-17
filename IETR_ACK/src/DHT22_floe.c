@@ -36,7 +36,7 @@ void init_TIMER(void){
     RCC -> APB1ENR1 |= RCC_APB1ENR1_TIM3EN; // TIMER 3 Enable (similaire aux GPIOAEN, GPIOBEN, USART2EN...)
     TIM3 -> PSC = 15; // F_timer = F_clk (16MHz) / (PSC+1). Si on veut un timer à 1MHz (donc incrément chaque 1us), on met PSC à 15
     TIM3 -> ARR = 0xFFFF; // 65535. Automatic reload définit le temps que prend un cycle avant de revenir à 0. Ici, 65.536ms 
-    TIM3 -> EGR |= TIM_EGR_UG; // Permet d'update manuellement le PSC
+    TIM3 -> EGR |= TIM_EGR_UG; // Permet d'update manuellement les générations
     TIM3 -> CR1 |= TIM_CR1_CEN; // Permet de démarrer le TIMER
 }
 

@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "../../Documents/PlatformIO/Projects/IETR_UART_RX"
+		},
+		{
+			"name": "IETR_UART",
+			"path": "../../Documents/PlatformIO/Projects/IETR_UART"
+		},
+		{
+			"name": "IETR_REQ",
+			"path": "../../Documents/PlatformIO/Projects/IETR_REQ"
+		},
+		{
+			"name": "IETR_ACK",
+			"path": "../../Documents/PlatformIO/Projects/IETR_ACK"
+		}
+	],
+	"settings": {}
+}
