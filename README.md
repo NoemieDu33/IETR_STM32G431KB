@@ -26,8 +26,8 @@ IETR Nantes - Ce projet configure deux STM32G431KB en bare metal afin d'interfac
 ### Utilisation
 
 * Vérifier que les composants soient bien branchés aux bons pins:
-![Image des branchements](./p1.png "Carte 1")
-![Image des branchements](./p2.png "Carte 2")
+![Image des branchements](./images/p1.png "Carte 1")
+![Image des branchements](./images/p2.png "Carte 2")
 
 * Brancher les deux cartes. Appuyer sur un des trois boutons de requête avec la carte reliée à l'écran.
 * La carte reliée aux composants devrait répondre avec la donnée demandée parmis les trois:

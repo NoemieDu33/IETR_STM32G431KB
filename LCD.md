@@ -18,13 +18,13 @@ Donc par exemple l'instruction ``0x03`` va activer les broches D5 et D4.
 
 ## Fonctionnement du LCD et précisions
 
-![Branchements](./16x2.png "")
+![Branchements](./images/16x2.png "")
 
 Nous allons utiliser l'écran en mode 4 bits.
 On le branche sur du 5V. 
 Cet écran n'utilise pas de procotole particulier. On lui envoie des instructions en hexadécimal en utilisant la table d'instructions, et on envoie une pulsation dans la broche E qui exécute l'instruction.
 
-![Table d'instructions](./table.png "")
+![Table d'instructions](./images/images/table.png "")
 
 Pour réinitialiser l'écran, on envoie trois fois l'instruction 0x03 (broches D4 et D5). Cette instruction n'est pas citée dans la table.
 
