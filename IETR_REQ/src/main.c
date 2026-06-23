@@ -2,10 +2,11 @@
 #include <stm32g4xx.h>
 #include <string.h>
 
-#include "lcd_floe.h"
+// #include "lcd_floe.h"
 #include "led_floe.h"
 #include "uart_floe.h"
 #include "delay_floe.h"
+#include "ssd1306_floe.h"
 
 #define RST_BUTTON 10 // GPIOA 
 #define REQ1_BUTTON 9 // GPIOA
@@ -56,10 +57,9 @@ void init_irq(void) {
     GPIOA->PUPDR &= ~(0x3 << 2*REQ3_BUTTON);
     GPIOA->PUPDR |= (0x1 << 2*REQ3_BUTTON);
 
-    SYSCFG->EXTICR[2] &= ~(SYSCFG_EXTICR3_EXTI10 | // EXTI du pin A10
-                            SYSCFG_EXTICR3_EXTI9 | // EXTI du pin A9
-                            SYSCFG_EXTICR1_EXTI0 | // EXTI du pin A0
-                            SYSCFG_EXTICR1_EXTI1); // EXTI du pin A1
+    // Au reset, tout vaut 0 (Port A). Pour être propre et explicite :
+    SYSCFG->EXTICR[0] &= ~(0xFFFF); // Clear pour EXTI0 à EXTI3 (oriente vers Port A)
+    SYSCFG->EXTICR[2] &= ~(0xFFFF); // Clear pour EXTI8 à EXTI11 (oriente vers Port A)
 
 
     EXTI->IMR1 |= EXTI_IMR1_IM10; // Ne pas masquer la ligne EXTI10 (ça revient à activer l'interruption)
@@ -97,42 +97,31 @@ void init_irq(void) {
 
 }
 
-// Les noms des fonctions d'interruption sont stricts et ne doivent pas être modifié
+// // Les noms des fonctions d'interruption sont stricts et ne doivent pas être modifié
 
-// EXTI15_10_IRQHandler gère les interruptions sur le Pin PA10.
-void EXTI15_10_IRQHandler(void) {
-    if (EXTI->PR1 & EXTI_PR1_PIF10) { // Le if permet de vérifier si c'est le bon pin qui a trigger l'interruption
-        
-        clear_screen(); // Contenu de l'interruption ici. 
+// // EXTI15_10_IRQHandler gère les interruptions sur le Pin PA10.
+// void EXTI15_10_IRQHandler(void) {
+//     if (EXTI->PR1 & EXTI_PR1_PIF10) { // Le if permet de vérifier si c'est le bon pin qui a trigger l'interruption
+      
+//         EXTI->PR1 = EXTI_PR1_PIF10; // Pour reset l'interruption il faut mettre le pin à 1
+//     }
+// }
 
-        EXTI->PR1 = EXTI_PR1_PIF10; // Pour reset l'interruption il faut mettre le pin à 1
-    }
-}
+// // EXTI9_5_IRQHandler gère les interruptions sur le Pin PA9.
+// void EXTI9_5_IRQHandler(void) {
+//     if (EXTI->PR1 & EXTI_PR1_PIF9) {
 
-// EXTI9_5_IRQHandler gère les interruptions sur le Pin PA9.
-void EXTI9_5_IRQHandler(void) {
-    if (EXTI->PR1 & EXTI_PR1_PIF9) {
-        
-        clear_screen();
-        send_text("REQ 1");
-        send_string("REQ 1\n");
-        delay(100000);
-        clear_screen();
-        flag_req = 1;
+//         flag_req = 1;
 
-        EXTI->PR1 = EXTI_PR1_PIF9;
-    }
-}
+//         EXTI->PR1 = EXTI_PR1_PIF9;
+//     }
+// }
 
 // EXTI0_IRQHandler gère les interruptions sur le Pin PA0.
 void EXTI0_IRQHandler(void) {
     if (EXTI->PR1 & EXTI_PR1_PIF0) {
         
-        clear_screen();
-        send_text("REQ 2");
-        send_string("REQ 2\n");
-        delay(100000);
-        clear_screen();
+        LED_ON();
         flag_req = 1;
 
         EXTI->PR1 = EXTI_PR1_PIF0;
@@ -143,52 +132,85 @@ void EXTI0_IRQHandler(void) {
 void EXTI1_IRQHandler(void) {
     if (EXTI->PR1 & EXTI_PR1_PIF1) {
         
-        clear_screen();
-        send_text("REQ 3");
-        send_string("REQ 3\n");
-        delay(100000);
-        clear_screen();
+
         flag_req = 1;
 
         EXTI->PR1 = EXTI_PR1_PIF1;
     }
 }
 
+
 int main(void){
-    init_gpios(); // Il faut que le premier module initialisé active GPIOA et GPIOB
-    init_uart();
+    init_gpios();
     init_led();
+
     init_irq();
     __enable_irq();
+    // 2. Initialisation de l'OLED (Configure les pins PA9/PA10, l'I2C1 et l'écran)
+    init_oled();
 
-    init_pins_lcd();
-    delay(DELAY); // Les delays sont importants pour que le 16x2 enregistre les infos (parfois il a besoin de qlq ms)
-    init_16x2();
-    delay(DELAY);
-    
-    char buf[64];
-    int i=0;
 
-    send_text("ALL OK");
+    // 3. Dessiner sur l'écran
+    // On commence toujours par vider le buffer pour éviter d'afficher des données résiduelles de la RAM
+    clear_screen_o();
+
+    draw_template_o();
+    update_screen();
 
     while(1){ // END_RX_TAG indique une fin de trame sur le LCD, et NEWLINE_TAG indique un saut de ligne. Voir les #define
-        if (flag_req==1){
-            char e = '\0';
-            e = recv_c();
-                if (!(e==END_RX_TAG)){
-                    LED_ON();
-                    if (!(e==NEWLINE_TAG)){
-                        send_letter(e);
-                        delay(DELAY);
-                    } else {
-                        newline();
-                        delay(DELAY);
-                    }
-                } else {
-                    flag_req = 0;
-                    LED_OFF();
-                }
+        
+        for (int i=0; i<61; i++){
+            graph_o(i);
+            update_screen();
         }
+        for (int i=61; i>0; i--){
+            graph_o(i);
+            update_screen();
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // if (flag_req==1){
+        //     LED_OFF();
+
+        //     flag_req = 0;
+            
+            // char e = '\0';
+            // e = recv_c();
+            //     if (!(e==END_RX_TAG)){
+            //         LED_ON();
+            //         if (!(e==NEWLINE_TAG)){
+            //             send_letter(e);
+            //             delay(DELAY);
+            //         } else {
+            //             newline();
+            //             delay(DELAY);
+            //         }
+            //     } else {
+            //         flag_req = 0;
+            //         LED_OFF();
+            //     }
+        // }
+    }
+}
+
+
+
+
+
+
+
 
 
     //     else {
@@ -204,9 +226,3 @@ int main(void){
     //         }
 
     //         }
-
-        } 
-
-
-
-    }

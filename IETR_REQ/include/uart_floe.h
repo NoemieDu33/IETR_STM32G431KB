@@ -3,8 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#define TX_PIN 2
-#define RX_PIN 15
+#define TX_PIN 2 // A
+#define RX_PIN 15 // A
 #define BAUDRATE 9600
 
 void init_uart(void);
