@@ -71,18 +71,18 @@ void send_c(char c){
 
 // recv_c récupère le contenu du recieved data register.
 // renvoie: un char
-char recv_c(){
-    while (!(USART2->ISR & USART_ISR_RXNE_RXFNE)); // RXNE = Recieve Data Register Not Empty (donc = 1 quand données reçues)
-    return (char)USART2->RDR; // RDR = Recieved Data Register (Si lu, alors RXNE repasse à 0)
+char recv_c(void){
+    // Si le registre de réception est vide, on ne bloque pas, on retourne 0
+    if (!(USART2->ISR & USART_ISR_RXNE_RXFNE)) {
+        return '\0'; 
+    }
+    return (char)USART2->RDR;
 }
 
 // send_string appelle send_c sur chaque caractère d'un string.
 // paramètres: un tableau de char
 void send_string(char* s){
-    int length = strlen(s);
-    for (int i=0; i<length; i++){
-        send_c(s[i]);
-        delay(100000);
+    while(*s) {
+        send_c(*s++);
     }
 }
-

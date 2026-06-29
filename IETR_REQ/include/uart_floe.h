@@ -7,6 +7,8 @@
 #define RX_PIN 15 // A
 #define BAUDRATE 9600
 
+#define DELAY_U 10000
+
 void init_uart(void);
 void send_c(char c);
 char recv_c(void);

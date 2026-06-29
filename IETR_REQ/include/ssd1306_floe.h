@@ -2,8 +2,9 @@
 #include <string.h>
 #include "delay_floe.h"
 
-#define SDA_PIN 7
-#define SCL_PIN 15
+#define OLED_SCL_PIN 9
+#define OLED_SDA_PIN 8 
+
 #define DELAY 200   
     
 void init_pins_oled(void);

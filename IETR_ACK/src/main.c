@@ -3,12 +3,12 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "2Y0A21_floe.h"
-#include "DHT22_floe.h"
 #include "led_floe.h"
 #include "uart_floe.h"
 #include "delay_floe.h"
 
+#include "DHT22_floe.h"
+#include "2Y0A21_floe.h"
 
 // init_gpios active les horloges des GPIOA et GPIOB pour les différents modules utilisés. Doit être lancé en premier.
 void init_gpios(void){
@@ -44,13 +44,13 @@ int main(void){
                 i++;
             } else {
                 char acknum = buf[4];
-                delay(1000000);
+                delay(10000);
 
 
                 if (acknum=='1'){ // Requête 1 : bouton de gauche = test
-                    delay(1000000);
+                    delay(10000);
                     send_string("Ceci est un test-Je suis Floe!\n");
-                    delay(500000);
+                    delay(50000);
                 } else if (acknum=='2'){ // Requête 2 : bouton du milieu = DHT22 ici
                     
                     uint16_t buf1[16];
@@ -84,20 +84,14 @@ int main(void){
                 } else if (acknum=='3'){ // Requête 3 : bouton de droite = télémètre ici
 
                     uint16_t buf1[16];
-                    uint16_t buf2[16];
-
                     uint16_t val = read_2Y0A21();
 
                     float res = adc_to_distance_cm(val);
                     int entier = (int)res;
                     int dec = (int)((res - (float)entier) *10);
 
-                    sprintf((char*)buf1,"DIST: %d.%d cm-", entier, dec);
-                    sprintf((char*)buf2, "Valeur: %u\n", val);
+                    sprintf((char*)buf1,"%u\n", val);
                     send_string((char*)buf1);
-
-                    delay(500000);
-                    send_string((char*)buf2);
                     
                     delay(1000000);
                 }
@@ -106,6 +100,8 @@ int main(void){
                 i = 0;
                 LED_OFF();
             }
+        } else {
+            LED_OFF();
         }
     }
 }
